@@ -4,7 +4,7 @@
  */
 export function uploadFile(
   body: Blob,
-  type: "video" | "thumb" | "avatar" | "banner" | "document",
+  type: "video" | "thumb" | "avatar" | "banner" | "ad" | "document",
   ext: string,
   onProgress?: (pct: number) => void,
 ): { promise: Promise<string>; abort: () => void } {

@@ -4,7 +4,9 @@ import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth";
 import { get, run, transaction } from "@/lib/db";
 import { logAdminAction, notify } from "@/lib/mutations";
-import { setSetting, SETTINGS } from "@/lib/settings";
+import { getHomeAd, setSetting, SETTINGS } from "@/lib/settings";
+import { storage } from "@/lib/storage";
+import type { ActionState } from "@/lib/types";
 import { claimVerification, decideVerification, reanalyzeVerification, type AdminDecision } from "@/lib/verification";
 
 type R = { ok: boolean; error?: string };
@@ -120,4 +122,49 @@ export async function resolveReportAction(reportId: string, outcome: "resolved" 
   await logAdminAction(admin.id, `report_${outcome}`, "report", reportId, note.trim());
   revalidatePath("/admin", "layout");
   return { ok: true };
+}
+
+/** Aceita https://…, www.…, wa.me/…, mailto: e tel:. Devolve o link pronto para usar no href (ou null se inválido). */
+function normalizeLink(raw: string): string | null {
+  const v = raw.trim();
+  if (!v) return "";
+  if (/^(mailto:|tel:)/i.test(v)) return v;
+  const withScheme = /^https?:\/\//i.test(v) ? v : `https://${v}`;
+  try {
+    const u = new URL(withScheme);
+    return u.hostname.includes(".") ? u.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Publicidade da página inicial: imagem, link do anunciante, texto alternativo, ativo e contato do "Anuncie aqui". */
+export async function saveHomeAdAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const admin = await requireAdmin();
+  const current = await getHomeAd();
+  const imageKey = String(form.get("image_key") ?? "");
+  const removeImage = form.get("remove_image") === "1";
+  const link = normalizeLink(String(form.get("link") ?? ""));
+  const contact = normalizeLink(String(form.get("contact") ?? ""));
+  const alt = String(form.get("alt") ?? "").trim().slice(0, 120) || "Patrocinador";
+  const active = form.get("active") === "on";
+
+  const fieldErrors: Record<string, string> = {};
+  if (imageKey && (!imageKey.startsWith("ads/") || !(await storage.exists(imageKey)))) fieldErrors.image = "Imagem inválida. Envie de novo.";
+  if (link === null) fieldErrors.link = "Link inválido.";
+  if (contact === null) fieldErrors.contact = "Link inválido.";
+  const finalImage = removeImage ? "" : imageKey || current.image;
+  if (active && !finalImage) fieldErrors.image = "Envie a imagem do anúncio antes de ativar.";
+  if (Object.keys(fieldErrors).length) return { fieldErrors, error: "Revise os campos destacados." };
+
+  await setSetting(SETTINGS.homeAdImage, finalImage);
+  await setSetting(SETTINGS.homeAdLink, link ?? "");
+  await setSetting(SETTINGS.homeAdContact, contact ?? "");
+  await setSetting(SETTINGS.homeAdAlt, alt);
+  await setSetting(SETTINGS.homeAdActive, active ? "true" : "false");
+  if (current.image && current.image !== finalImage) void storage.remove(current.image);
+  await logAdminAction(admin.id, active ? "ad_home_on" : "ad_home_off", "settings", "ads.home", alt);
+
+  revalidatePath("/", "layout");
+  return { ok: true, message: active ? "Publicidade salva e no ar." : "Publicidade salva (desativada)." };
 }
