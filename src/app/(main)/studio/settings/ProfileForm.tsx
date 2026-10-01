@@ -60,12 +60,12 @@ export function ProfileForm({ user }: { user: U }) {
             // eslint-disable-next-line @next/next/no-img-element
             <img src={bannerUrl} alt="" className="aspect-[6/1] w-full object-cover" />
           ) : (
-            <div className="relative aspect-[6/1] w-full bg-gradient-to-r from-ink to-ink-2">
+            <div className="relative aspect-[6/1] w-full rounded-2xl border border-line bg-white">
               <div className="tricolore absolute right-0 bottom-0 left-0 h-1.5" />
             </div>
           )}
-          <span className="absolute inset-0 flex items-center justify-center bg-ink/30 text-sm font-medium text-white opacity-0 transition hover:opacity-100">
-            <Icon name="camera" className="mr-2" /> {busy === "banner" ? "Enviando…" : "Trocar capa"}
+          <span className="btn absolute top-3 right-3 bg-white/90 text-ink shadow-sm hover:bg-white">
+            <Icon name="camera" size={18} /> {busy === "banner" ? "Enviando…" : "Trocar capa"}
           </span>
           <input type="file" accept="image/*" className="hidden" onChange={(e) => upload(e.target.files?.[0], "banner")} />
         </label>

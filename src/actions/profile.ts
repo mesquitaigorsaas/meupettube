@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { run } from "@/lib/db";
 import { reindexChannel } from "@/lib/mutations";
@@ -49,5 +50,6 @@ export async function updateProfileAction(_: ActionState, form: FormData): Promi
   if (name !== user.name) await reindexChannel(user.id);
 
   revalidatePath("/", "layout");
-  return { ok: true, message: "Canal atualizado." };
+  // Depois de salvar, leva direto para o canal (como o YouTube faz).
+  redirect(`/@${user.handle}`);
 }

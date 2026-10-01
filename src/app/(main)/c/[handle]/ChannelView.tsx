@@ -36,16 +36,21 @@ export async function ChannelView({ handle, tab, sort }: { handle: string; tab: 
   return (
     <div className="mx-auto w-full max-w-[1284px] px-4 pb-10 sm:px-6">
       {/* Banner */}
-      <div className="mt-2 overflow-hidden rounded-2xl">
+      <div className="relative mt-2 overflow-hidden rounded-2xl">
         {banner ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={banner} alt="" className="aspect-[6/1] w-full object-cover" />
         ) : (
-          <div className="relative aspect-[6/1] min-h-24 w-full bg-gradient-to-r from-ink via-ink-2 to-ink">
+          <div className="relative aspect-[6/1] min-h-24 w-full rounded-2xl border border-line bg-white">
             <div className="tricolore absolute right-0 bottom-0 left-0 h-1.5" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/mark.png" alt="" className="absolute top-1/2 right-8 h-3/5 -translate-y-1/2 opacity-15 invert" />
+            <img src="/mark.png" alt="" className="absolute top-1/2 right-8 h-3/5 -translate-y-1/2 opacity-15" />
           </div>
+        )}
+        {isMe && (
+          <Link href="/studio/settings" className="btn absolute top-3 right-3 bg-white/90 text-ink shadow-sm hover:bg-white">
+            <Icon name="camera" size={18} /> Trocar capa
+          </Link>
         )}
       </div>
 
