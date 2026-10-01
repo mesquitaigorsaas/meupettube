@@ -2,15 +2,26 @@ import { mediaUrl } from "@/lib/format";
 import type { HomeAd } from "@/lib/settings";
 
 /**
- * Faixa de publicidade da página inicial (proporção 1063 × 139).
+ * Faixa de publicidade da página inicial.
+ * Computador: 1063 × 139. Celular: imagem própria em 32:10 (se houver); senão a de computador, fininha.
  * Anúncio ativo → imagem com link do anunciante. Sem anúncio → "Anuncie aqui" (se houver contato) ou nada.
  */
 export function HomeAdBanner({ ad, preview = false }: { ad: HomeAd; preview?: boolean }) {
   const url = mediaUrl(ad.image);
+  const mobileUrl = mediaUrl(ad.imageMobile);
 
   if (ad.active && url) {
-    // eslint-disable-next-line @next/next/no-img-element
-    const img = <img src={url} alt={ad.alt} className="aspect-[1063/139] w-full rounded-xl object-cover" />;
+    const img = (
+      <picture>
+        {mobileUrl && <source media="(max-width: 639px)" srcSet={mobileUrl} />}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={url}
+          alt={ad.alt}
+          className={`w-full rounded-xl object-cover ${mobileUrl ? "aspect-[32/10] sm:aspect-[1063/139]" : "aspect-[1063/139]"}`}
+        />
+      </picture>
+    );
     return (
       <div className="relative mb-6">
         {ad.link ? (
@@ -33,10 +44,10 @@ export function HomeAdBanner({ ad, preview = false }: { ad: HomeAd; preview?: bo
         href={ad.contact}
         target="_blank"
         rel="noopener"
-        className="mb-6 flex aspect-[1063/139] w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-line bg-cream-2 px-4 text-center transition hover:border-tomato/50"
+        className="mb-6 flex aspect-[32/10] w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-line bg-cream-2 px-4 text-center transition hover:border-tomato/50 sm:aspect-[1063/139]"
       >
-        <span className="text-sm font-bold sm:text-lg">Anuncie aqui no Meu PetTube</span>
-        <span className="mt-0.5 text-xs text-muted sm:text-sm">Seu negócio na página inicial de quem ama pets · fale com a gente</span>
+        <span className="text-base font-bold sm:text-lg">Anuncie aqui no Meu PetTube</span>
+        <span className="mt-1 text-xs text-muted sm:text-sm">Seu negócio na página inicial de quem ama pets · fale com a gente</span>
       </a>
     );
   }

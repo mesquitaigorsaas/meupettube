@@ -144,6 +144,8 @@ export async function saveHomeAdAction(_: ActionState, form: FormData): Promise<
   const current = await getHomeAd();
   const imageKey = String(form.get("image_key") ?? "");
   const removeImage = form.get("remove_image") === "1";
+  const mobileKey = String(form.get("image_mobile_key") ?? "");
+  const removeMobile = form.get("remove_image_mobile") === "1";
   const link = normalizeLink(String(form.get("link") ?? ""));
   const contact = normalizeLink(String(form.get("contact") ?? ""));
   const alt = String(form.get("alt") ?? "").trim().slice(0, 120) || "Patrocinador";
@@ -151,18 +153,22 @@ export async function saveHomeAdAction(_: ActionState, form: FormData): Promise<
 
   const fieldErrors: Record<string, string> = {};
   if (imageKey && (!imageKey.startsWith("ads/") || !(await storage.exists(imageKey)))) fieldErrors.image = "Imagem inválida. Envie de novo.";
+  if (mobileKey && (!mobileKey.startsWith("ads/") || !(await storage.exists(mobileKey)))) fieldErrors.imageMobile = "Imagem inválida. Envie de novo.";
   if (link === null) fieldErrors.link = "Link inválido.";
   if (contact === null) fieldErrors.contact = "Link inválido.";
   const finalImage = removeImage ? "" : imageKey || current.image;
+  const finalMobile = removeMobile ? "" : mobileKey || current.imageMobile;
   if (active && !finalImage) fieldErrors.image = "Envie a imagem do anúncio antes de ativar.";
   if (Object.keys(fieldErrors).length) return { fieldErrors, error: "Revise os campos destacados." };
 
   await setSetting(SETTINGS.homeAdImage, finalImage);
+  await setSetting(SETTINGS.homeAdImageMobile, finalMobile);
   await setSetting(SETTINGS.homeAdLink, link ?? "");
   await setSetting(SETTINGS.homeAdContact, contact ?? "");
   await setSetting(SETTINGS.homeAdAlt, alt);
   await setSetting(SETTINGS.homeAdActive, active ? "true" : "false");
   if (current.image && current.image !== finalImage) void storage.remove(current.image);
+  if (current.imageMobile && current.imageMobile !== finalMobile) void storage.remove(current.imageMobile);
   await logAdminAction(admin.id, active ? "ad_home_on" : "ad_home_off", "settings", "ads.home", alt);
 
   revalidatePath("/", "layout");

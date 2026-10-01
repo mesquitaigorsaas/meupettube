@@ -15,7 +15,7 @@ export default async function AdsAdminPage() {
           Faixa de 1063 × 139 px logo abaixo dos filtros da página inicial, para patrocinadores. Troque a imagem e o link quando quiser.
         </p>
       </div>
-      <AdForm ad={ad} imageUrl={mediaUrl(ad.image)} />
+      <AdForm ad={ad} imageUrl={mediaUrl(ad.image)} mobileUrl={mediaUrl(ad.imageMobile)} />
       <div>
         <p className="label">Como aparece para os visitantes agora</p>
         <HomeAdBanner ad={ad} preview />
