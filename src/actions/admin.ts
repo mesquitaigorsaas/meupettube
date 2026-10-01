@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { get, run, transaction } from "@/lib/db";
 import { logAdminAction, notify } from "@/lib/mutations";
@@ -172,5 +173,6 @@ export async function saveHomeAdAction(_: ActionState, form: FormData): Promise<
   await logAdminAction(admin.id, active ? "ad_home_on" : "ad_home_off", "settings", "ads.home", alt);
 
   revalidatePath("/", "layout");
-  return { ok: true, message: active ? "Publicidade salva e no ar." : "Publicidade salva (desativada)." };
+  // Depois de salvar, leva para a página inicial do canal do admin (mesmo comportamento do Personalizar canal).
+  redirect(`/@${admin.handle}`);
 }
