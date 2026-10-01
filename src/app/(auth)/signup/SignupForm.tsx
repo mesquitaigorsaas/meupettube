@@ -39,7 +39,7 @@ export function SignupForm({ next }: { next: string }) {
           setHandle(slugifyHandle(e.target.value));
         }}
         error={fe.handle}
-        hint={handle ? `Seu canal: pettube.com/@${handle}` : "Letras, números, ponto e _"}
+        hint={handle ? `Seu canal: meupettube.com/@${handle}` : "Letras, números, ponto e _"}
       />
       <Field label="E-mail" name="email" type="email" autoComplete="email" required error={fe.email} />
       <Field label="Senha" name="password" type="password" autoComplete="new-password" required minLength={8} error={fe.password} hint="Mínimo de 8 caracteres." />

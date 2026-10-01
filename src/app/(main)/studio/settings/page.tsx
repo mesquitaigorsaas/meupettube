@@ -13,7 +13,7 @@ export default async function SettingsPage() {
       <Link href="/studio" className="mb-4 inline-flex items-center gap-1 text-sm text-muted hover:text-ink">
         <Icon name="arrowLeft" size={16} /> Estúdio
       </Link>
-      <PageTitle icon="settings" title="Personalizar canal" subtitle={`pettube.com/@${user.handle}`} />
+      <PageTitle icon="settings" title="Personalizar canal" subtitle={`meupettube.com/@${user.handle}`} />
       <ProfileForm
         user={{
           name: user.name,
