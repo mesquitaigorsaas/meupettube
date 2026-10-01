@@ -1,6 +1,5 @@
 import { mediaUrl } from "@/lib/format";
 import { getHomeAd } from "@/lib/settings";
-import { HomeAdBanner } from "@/components/HomeAdBanner";
 import { AdForm } from "./AdForm";
 
 export const metadata = { title: "Publicidade" };
@@ -16,10 +15,6 @@ export default async function AdsAdminPage() {
         </p>
       </div>
       <AdForm ad={ad} imageUrl={mediaUrl(ad.image)} mobileUrl={mediaUrl(ad.imageMobile)} />
-      <div>
-        <p className="label">Como aparece para os visitantes agora</p>
-        <HomeAdBanner ad={ad} preview />
-      </div>
     </div>
   );
 }
