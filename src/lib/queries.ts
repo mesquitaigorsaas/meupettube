@@ -39,6 +39,18 @@ export async function trendingVideos(limit = 24, category?: string) {
   );
 }
 
+/**
+ * Destaques: vídeos da equipe (contas admin) com arquivo, do mais novo para o mais antigo.
+ * Vão sempre no topo da página inicial, para quem chega já ver conteúdo de verdade.
+ */
+export async function featuredVideos(limit = 24, category?: string) {
+  return await all<VideoCardData>(
+    `SELECT ${CARD_COLUMNS} ${FROM} WHERE ${LISTABLE} AND u.role = 'admin' AND v.video_key IS NOT NULL
+     ${category ? "AND v.category = ?" : ""} ORDER BY v.created_at DESC LIMIT ?`,
+    ...(category ? [category, limit] : [limit]),
+  );
+}
+
 export async function followingVideos(userId: string, limit = 24) {
   return await all<VideoCardData>(
     `SELECT ${CARD_COLUMNS} ${FROM} JOIN follows f ON f.following_id = v.user_id AND f.follower_id = ?

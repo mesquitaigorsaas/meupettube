@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getCurrentUser, canPublish } from "@/lib/auth";
 import { CATEGORIES, categoryName } from "@/lib/constants";
 import { all } from "@/lib/db";
-import { activeDiscussions, followingVideos, forYou, newCreators, trendingVideos } from "@/lib/queries";
+import { activeDiscussions, featuredVideos, followingVideos, forYou, newCreators, trendingVideos } from "@/lib/queries";
 import { ChannelCard, EmptyState, PageContainer, Shelf } from "@/components/ui";
 import { VideoCard, VideoGrid } from "@/components/video/VideoCard";
 import { Icon } from "@/components/icons";
@@ -30,7 +30,9 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
   const adBanner = <HomeAdBanner ad={ad} />;
 
   if (category) {
-    const videos = await forYou(user?.id ?? null, 48, category);
+    const featured = await featuredVideos(24, category);
+    const ids = new Set(featured.map((v) => v.id));
+    const videos = [...featured, ...(await forYou(user?.id ?? null, 48, category)).filter((v) => !ids.has(v.id))];
     return (
       <PageContainer className="pt-0">
         {chips}
@@ -44,7 +46,10 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
     );
   }
 
-  const feed = await forYou(user?.id ?? null, 36);
+  // Destaques da equipe sempre primeiro; depois a recomendação normal (sem repetir).
+  const featured = await featuredVideos(24);
+  const featuredIds = new Set(featured.map((v) => v.id));
+  const feed = [...featured, ...(await forYou(user?.id ?? null, 36)).filter((v) => !featuredIds.has(v.id))];
   const following = user ? await followingVideos(user.id, 8) : [];
   const trending = await trendingVideos(8);
   const discussions = await activeDiscussions(4);
@@ -67,7 +72,7 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
     <PageContainer className="pt-0">
       {chips}
         {adBanner}
-      <VideoGrid videos={feed.slice(0, 8)} />
+      <VideoGrid videos={feed.slice(0, Math.max(8, featured.length))} />
 
       {following.length > 0 && (
         <Shelf title="Seguindo" icon="following" href="/feed/following">
@@ -107,9 +112,9 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
         <VideoGrid videos={trending.slice(0, 4)} />
       </Shelf>
 
-      {feed.length > 8 && (
+      {feed.length > Math.max(8, featured.length) && (
         <Shelf title="Mais para você" icon="sparkles">
-          <VideoGrid videos={feed.slice(8)} />
+          <VideoGrid videos={feed.slice(Math.max(8, featured.length))} />
         </Shelf>
       )}
     </PageContainer>
