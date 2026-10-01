@@ -11,6 +11,8 @@ export function HomeAdBanner({ ad, preview = false }: { ad: HomeAd; preview?: bo
   const mobileUrl = mediaUrl(ad.imageMobile);
 
   if (ad.active && url) {
+    // Sem link do anunciante, o clique leva ao contato de quem quer anunciar (útil para a arte "Seja nosso patrocinador").
+    const href = ad.link || ad.contact;
     const img = (
       <picture>
         {mobileUrl && <source media="(max-width: 639px)" srcSet={mobileUrl} />}
@@ -24,8 +26,8 @@ export function HomeAdBanner({ ad, preview = false }: { ad: HomeAd; preview?: bo
     );
     return (
       <div className="relative mb-6">
-        {ad.link ? (
-          <a href={ad.link} target="_blank" rel="sponsored noopener" className="block">
+        {href ? (
+          <a href={href} target="_blank" rel={ad.link ? "sponsored noopener" : "noopener"} className="block">
             {img}
           </a>
         ) : (

@@ -131,7 +131,7 @@ export function AdForm({ ad, imageUrl, mobileUrl }: { ad: HomeAd; imageUrl: stri
           defaultValue={ad.link}
           maxLength={300}
           placeholder="www.patrocinador.com.br ou wa.me/5531…"
-          hint="Para onde vai quem clicar no anúncio. Pode deixar vazio."
+          hint="Para onde vai quem clicar no anúncio. Vazio = usa o contato abaixo."
           error={fe.link}
         />
         <Field
@@ -149,7 +149,7 @@ export function AdForm({ ad, imageUrl, mobileUrl }: { ad: HomeAd; imageUrl: stri
             defaultValue={ad.contact}
             maxLength={300}
             placeholder="wa.me/5531999999999 ou mailto:contato@meupettube.com.br"
-            hint="Enquanto não houver anúncio ativo, a faixa mostra “Anuncie aqui” com este link. Vazio = a faixa fica escondida."
+            hint="Usado no “Anuncie aqui” (quando não há anúncio ativo) e no clique do anúncio sem link próprio. Vazio = sem anúncio, a faixa fica escondida."
             error={fe.contact}
           />
         </div>
