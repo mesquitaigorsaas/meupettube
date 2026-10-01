@@ -49,6 +49,13 @@ export async function destroySession() {
   jar.delete(SESSION_COOKIE);
 }
 
+/** Encerra as outras sessões do usuário (outros aparelhos), mantendo a atual. Usado ao trocar a senha. */
+export async function endOtherSessions(userId: string) {
+  const token = (await cookies()).get(SESSION_COOKIE)?.value;
+  if (token) await run("DELETE FROM sessions WHERE user_id = ? AND id <> ?", userId, tokenHash(token));
+  else await run("DELETE FROM sessions WHERE user_id = ?", userId);
+}
+
 const USER_COLUMNS = `u.id, u.email, u.name, u.handle, u.avatar_key, u.banner_key, u.bio, u.specialty, u.location,
   u.website, u.instagram, u.role, u.member_type, u.verification_status, u.status, u.followers_count,
   u.following_count, u.created_at`;

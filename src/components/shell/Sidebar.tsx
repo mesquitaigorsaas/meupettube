@@ -100,9 +100,10 @@ export function Sidebar({ user, following, variant }: Props) {
         ))}
       </Section>
 
-      {user && (user.role === "admin" || user.verification_status !== "verified") && (
+      {user && (
         <Section>
           {user.verification_status !== "verified" && <Item href="/verification" icon="shield" label="Verificação" active={isActive("/verification")} />}
+          <Item href="/password" icon="shield" label="Trocar senha" active={isActive("/password")} />
           {user.role === "admin" && <Item href="/admin" icon="settings" label="Administração" active={isActive("/admin")} />}
         </Section>
       )}

@@ -23,6 +23,7 @@ export default async function YouPage() {
     { href: "/notifications", icon: "bell", label: "Notificações" },
     { href: "/verification", icon: "shield", label: `Verificação · ${VERIFICATION_STATUS[user.verification_status]}` },
     { href: "/studio/settings", icon: "settings", label: "Configurações do canal" },
+    { href: "/password", icon: "shield", label: "Trocar senha" },
   ];
   if (user.role === "admin") links.push({ href: "/admin", icon: "shield", label: "Administração" });
 

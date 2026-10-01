@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { createSession, destroySession, hashPassword, verifyPassword } from "@/lib/auth";
+import { createSession, destroySession, endOtherSessions, getCurrentUser, hashPassword, verifyPassword } from "@/lib/auth";
 import { get, newId, run } from "@/lib/db";
 import { slugifyHandle } from "@/lib/format";
 import type { ActionState } from "@/lib/types";
@@ -61,4 +61,31 @@ export async function loginAction(_: ActionState, form: FormData): Promise<Actio
 export async function logoutAction() {
   await destroySession();
   redirect("/");
+}
+
+/**
+ * Trocar senha (qualquer conta). Pede a senha atual; contas criadas pelo Google podem definir
+ * a primeira senha sem ela (nunca tiveram uma). Ao trocar, sai dos outros aparelhos.
+ */
+export async function changePasswordAction(_: ActionState, form: FormData): Promise<ActionState> {
+  const me = await getCurrentUser();
+  if (!me) return { error: "Entre na sua conta." };
+  const row = await get<{ password_hash: string; google_sub: string | null }>("SELECT password_hash, google_sub FROM users WHERE id = ?", me.id);
+  if (!row) return { error: "Conta não encontrada." };
+
+  const current = String(form.get("current") ?? "");
+  const next = String(form.get("password") ?? "");
+  const confirm = String(form.get("confirm") ?? "");
+  const googleOnly = !!row.google_sub && !current;
+
+  const fieldErrors: Record<string, string> = {};
+  if (!googleOnly && !verifyPassword(current, row.password_hash)) fieldErrors.current = "Senha atual incorreta.";
+  if (next.length < 8) fieldErrors.password = "A nova senha precisa ter pelo menos 8 caracteres.";
+  else if (next === current) fieldErrors.password = "A nova senha precisa ser diferente da atual.";
+  if (confirm !== next) fieldErrors.confirm = "As senhas não são iguais.";
+  if (Object.keys(fieldErrors).length) return { fieldErrors, error: "Revise os campos destacados." };
+
+  await run("UPDATE users SET password_hash = ? WHERE id = ?", hashPassword(next), me.id);
+  await endOtherSessions(me.id);
+  return { ok: true, message: "Senha trocada. Use a nova senha no próximo login (os outros aparelhos foram desconectados)." };
 }
