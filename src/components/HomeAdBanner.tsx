@@ -25,17 +25,28 @@ export function HomeAdBanner({ ad, preview = false }: { ad: HomeAd; preview?: bo
       </picture>
     );
     return (
-      <div className="relative mb-6">
-        {href ? (
-          <a href={href} target="_blank" rel={ad.link ? "sponsored noopener" : "noopener"} className="block">
-            {img}
-          </a>
-        ) : (
-          img
+      <div className="mb-6">
+        <div className="relative">
+          {href ? (
+            <a href={href} target="_blank" rel={ad.link ? "sponsored noopener" : "noopener"} className="block">
+              {img}
+            </a>
+          ) : (
+            img
+          )}
+          <span className="pointer-events-none absolute top-2 left-2 rounded bg-black/55 px-1.5 py-0.5 text-[10px] font-medium tracking-wide text-white uppercase">
+            Publicidade
+          </span>
+        </div>
+        {/* Contato para anunciantes sempre visível, com ou sem patrocinador ativo. */}
+        {ad.contact && (
+          <p className="mt-1.5 text-right text-xs text-muted">
+            Quer seu negócio aqui?{" "}
+            <a href={ad.contact} target="_blank" rel="noopener" className="font-semibold text-gold hover:underline">
+              Anuncie aqui
+            </a>
+          </p>
         )}
-        <span className="pointer-events-none absolute top-2 left-2 rounded bg-black/55 px-1.5 py-0.5 text-[10px] font-medium tracking-wide text-white uppercase">
-          Publicidade
-        </span>
       </div>
     );
   }

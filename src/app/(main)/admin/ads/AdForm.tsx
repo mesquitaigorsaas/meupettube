@@ -149,7 +149,7 @@ export function AdForm({ ad, imageUrl, mobileUrl }: { ad: HomeAd; imageUrl: stri
             defaultValue={ad.contact}
             maxLength={300}
             placeholder="wa.me/5531999999999 ou mailto:contato@meupettube.com.br"
-            hint="Usado no “Anuncie aqui” (quando não há anúncio ativo) e no clique do anúncio sem link próprio. Vazio = sem anúncio, a faixa fica escondida."
+            hint="Aparece sempre como “Anuncie aqui” (abaixo do anúncio, ou no lugar dele quando não houver). Também é o destino do clique no anúncio sem link próprio."
             error={fe.contact}
           />
         </div>
