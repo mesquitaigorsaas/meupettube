@@ -41,9 +41,9 @@ export function HomeAdBanner({ ad, preview = false }: { ad: HomeAd; preview?: bo
         {/* Contato para anunciantes sempre visível, com ou sem patrocinador ativo. */}
         {ad.contact && (
           <p className="mt-1.5 text-right text-xs text-muted">
-            Quer seu negócio aqui?{" "}
+            Quer aparecer aqui?{" "}
             <a href={ad.contact} target="_blank" rel="noopener" className="font-semibold text-gold hover:underline">
-              Anuncie aqui
+              Então clique.
             </a>
           </p>
         )}
